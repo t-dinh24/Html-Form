@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta charset="utf-8">
+		
+		<style type="text/css">
+			.redB			{background-color: lightblue;}
+		
+			div.visible 	{ display: block; }
+			div.invisible 	{ display: none; }
+			
+			#outputDiv		{
+								color: green;  /* font */
+								font-size: 30px;
+							}
+			#backgroundDiv	{	
+								height: 900px;
+								width: 100%;
+							}
+			#errDiv			{color: red;}
+		
+		</style>
+		
+		
+		<script type="text/javascript">
+		
+		// var decs
+		var theUsername;
+		var thePassword;
+		var theId;
+		var theMessage;
+		var wordCount;
+		var theButton;
+		var outputDiv;	
+		var backgroundDiv;
+		//used to change the background of the page when error.	
+		var visible = false;
+		var errDiv;
+		//used to display the error text at the bottom of the page after submit button clicked
+
+		function typedInTextArea( e )
+		{
+			var currentContents = theMessage.value;
+			var words = currentContents.split(" ");
+			var howManyWords = 25-words.length; 
+			wordCount.innerHTML = howManyWords;
+
+			//disable the text area when 25 spaces are entered
+			if(howManyWords == 0)
+			{
+				e.preventDefault();
+			}
+		}
+
+		//I tried splitting parts of the checks into separate functions but I am not sure why when I split them and called the function inside formSubmitted it would not work. For example I got the errors to show up but when I fix the input so that the form should be accpeted and hit the submit button nothing would happen. Since I ran out of time I decided to add them all into just the formSubmitted.
+		function formSubmitted()
+		{			
+			var usernameCheck = false;
+			var passwordCheck = false;
+			var idcheck = false;
+			errDiv.innerHTML="";
+
+			//--------------------------------------------------------------------
+
+			//check username if it only contains letter true, else add error code.
+			var str = theUsername.value;
+
+			//This expression will check to make sure that the entire string will only be letters that are between capital A-Z or lower case a-z. The .match will check that the string matches what is inside the brackets in this case [A-Za-z]. The + makes sure that it does not allow any empty matches and ^ and $ are used to match the beginning(^) and end($) of the string. This makes it so that only strings with letters are accepted.
+			var letters = /^[A-Za-z]+$/;
+			if(str.match(letters))
+			{
+				lettersOnly = true;
+			}
+			else
+			{
+				errDiv.innerHTML +="Error with Username. ";
+				lettersOnly = false;
+			}
+			usernameCheck = lettersOnly;
+
+			//--------------------------------------------------------------------
+
+
+			//check password if it meets all requirements pass, else add error code.
+			str = thePassword.value;
+			var hasCapital = false;
+			var hasLower = false;
+			var hasNumber = false;
+
+			// This expression will check if there is anything that is within capital A-Z. It will look for whatever is within the brackets which in this case is A-Z
+			if(/[A-Z]/.test(str))
+			{
+				hasCapital = true;
+			}
+
+			// This expression will check if there is anything that is within lower a-z. It will look for whatever is within the brackets which in this case is a-z
+			if(/[a-z]/.test(str))
+			{
+				hasLower = true;
+			}
+			// This expression will check if there is anything that is a digit from 0-9. \d tests for numeric digits 0-9
+			if(/\d/.test(str))
+			{
+				hasNumber = true;
+			}
+			if(hasCapital && hasLower && hasNumber)
+			{
+				passwordCheck = true;
+			}
+			else
+			{
+				errDiv.innerHTML+="Error with password. ";
+			}
+
+
+			//--------------------------------------------------------------------
+
+
+
+			//check id, add error code if it doesnt meet requirements
+			str = theId.value;
+			var theLength = false;
+			var isNumbers = false;
+			var hasDecimal = false;
+			if (str.length == 9) 
+			{
+				theLength = true;
+			}
+			//isNaN will check if there is any numbers in the string. If the string has numbers only then isNaN will be false, however since decimals are numbers I added an extra check to make sure that there is no "." in the string to make sure that the id number is actually 9 digits and that if it has a "." then it will not accept the string
+			if(isNaN(str))
+			{
+				isNumbers = false;
+			}
+			else
+			{
+				isNumbers = true;
+			}
+			var decimalFoundAt = str.indexOf(".");
+			if (decimalFoundAt !== -1)
+			{
+				hasDecimal = true;
+			}
+
+			if(theLength && isNumbers && hasDecimal !== true)
+			{
+				idcheck = true;
+			}
+			else
+			{
+				errDiv.innerHTML +="Error with ID. ";
+			}
+
+			//--------------------------------------------------------------------
+
+
+			//checkall, final check to make sure that all requirment are met for the form.
+			if(usernameCheck && passwordCheck && idcheck)
+			{
+				outputDiv.innerHTML = "SUCCESS!!!";	
+				backgroundDiv.setAttribute("class", "white");
+				errDiv.setAttribute("class", "invisible");
+
+			}
+			else
+			{
+				outputDiv.innerHTML = "";
+				backgroundDiv.setAttribute("class", "redB");
+				errDiv.setAttribute("class", "visible");
+			}						
+			outputDiv.setAttribute("class", "visible");	
+			visible = true;
+		}
+		
+		
+		function init()
+		{
+			theUsername = document.getElementById("theUsername");
+
+			thePassword = document.getElementById("thePassword");
+
+			theId = document.getElementById("theId");
+
+			theMessage =  document.getElementById("theMessage");
+			theMessage.addEventListener("keydown", typedInTextArea, false);
+
+			wordCount =  document.getElementById("wordCount");
+			
+			theButton = document.getElementById("theButton");
+			theButton.addEventListener("click", formSubmitted);
+
+			
+			outputDiv = document.getElementById("outputDiv");
+			outputDiv.setAttribute("class", "invisible");
+
+			errDiv = document.getElementById("errDiv");
+			errDiv.setAttribute("class", "invisible");
+
+			backgroundDiv = document.getElementById("backgroundDiv");
+			backgroundDiv.setAttribute("class", "visible");
+		}
+
+
+		// wait for the window/DOM to load before using document object
+		window.addEventListener("load", init);
+		
+		
+		</script>
+	</head>
+	<body>
+		<div id="backgroundDiv">
+			<form method="get" action="#">
+				<label> Username:
+					<input type="text" name="theUsername" id="theUsername" value="">
+					<br>
+					use only letters(a-z)
+				</label>
+				<br><br>
+				<label>Password:
+					<input type="password" name="thePassword" id="thePassword" value="">
+					<br>
+					make a password consisting of at least 1 Uppercase, 1 lowercase, and 1 number.
+				</label>
+				<br><br>
+				<label>ID Number:
+					<input type="text" name="theId" id="theId" value="" maxlength="9">
+					<br>
+					enter id number (should only be numbers 9 digits long)
+				</label>
+				<br><br>	
+				<label>Message:<br>
+					<textarea name="theMessage" id="theMessage" rows="12" cols="80"></textarea>
+				</label>
+				<br>
+				Number of words: <span id="wordCount">25</span>
+				<br><br><br>
+				<input type="button" id="theButton" value="Submit">
+			</form>
+			<br><br><br>
+			<div id="outputDiv"></div>	
+			<div id="errDiv"></div>
+		</div>	
+	</body>
+</html>
